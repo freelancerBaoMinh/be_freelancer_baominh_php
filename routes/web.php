@@ -21,6 +21,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('login', 'Api\Customer\LoginController@login');
     });
     $router->group(['middleware'=>'jwt.auth'], function () use ($router){
-        $router->post('user/logout', 'Api\Customer\LoginController@logout');
+        $router->group(['prefix'=>'user'], function () use ($router){
+            $router->post('logout', 'Api\Customer\LoginController@logout');
+            $router->post('changePass', 'Api\Customer\UserController@changePass');
+        });
     });
 });
