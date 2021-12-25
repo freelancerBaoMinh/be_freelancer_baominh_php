@@ -17,6 +17,7 @@ class CreatePackagesTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('code', 20)->index();
+            $table->boolean('status')->default(1)->comment('0: Delete, 1: Normal');
 //            $table->timestamps();
         });
     }

@@ -10,11 +10,13 @@ class PackagesTableSeeder extends \Illuminate\Database\Seeder
         DB::table('packages')->insert([
             [
                 'name'=>'CƠ BẢN',
-                'code'=>'co_ban_1'
+                'code'=>'co_ban_1',
+                'status'=>1
             ],
             [
                 'name'=>'Vàng',
-                'code'=>'vang'
+                'code'=>'vang',
+                'status'=>1
             ]
         ]);
     }

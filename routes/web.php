@@ -25,5 +25,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('logout', 'Api\Customer\LoginController@logout');
             $router->post('changePass', 'Api\Customer\UserController@changePass');
         });
+        $router->group(['prefix'=>'admin', 'middleware'=>'admin'], function () use ($router){
+            $router->get('list-package', 'Api\Admin\HomeController@listPackage');
+            $router->get('detail-package', 'Api\Admin\HomeController@detailPackage');
+        });
     });
 });

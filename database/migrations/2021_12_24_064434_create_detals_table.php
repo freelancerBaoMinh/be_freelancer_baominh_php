@@ -17,7 +17,7 @@ class CreateDetalsTable extends Migration
             $table->id();
             $table->string('value');
             $table->integer('rule_id');
-            $table->integer('package_id');
+            $table->integer('package_id')->index();
             $table->timestamps();
         });
     }
