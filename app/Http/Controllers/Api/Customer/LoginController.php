@@ -38,17 +38,17 @@ class LoginController extends \App\Http\Controllers\Controller
            'password'=>'required|string'
         ]);
         $input = $request->only(['username', 'password']);
-        $token= $this->jwt->attempt($input);
-        if (!$token)
-        {
-            return $this->errorResponse('Username hoặc mật khẩu không đúng', 413);
-        }
         $user = $this->userRepository->findByUsername($request->get('username'));
-        if ((int)$user->status === 0)
+        if ($user)
         {
-            return $this->errorResponse('User chưa active', 413);
+            $token= $this->jwt->attempt($input);
+            if (!$token)
+            {
+                return $this->errorResponse('Username hoặc mật khẩu không đúng', 413);
+            }
+            return $this->successResponseMessage(['token'=>$token, 'user'=>new UserResources($user)], 200, 'success');
         }
-        return $this->successResponseMessage(['token'=>$token, 'user'=>new UserResources($user)], 200, 'success');
+        return $this->successResponseMessage(new \stdClass(), 404, 'User không tồn tại');
     }
     public function logout(Request $request)
     {

@@ -28,4 +28,21 @@ class RuleRepository extends \App\Repository\BaseRepository implements RuleRepos
             ->orderBy('order')
             ->get()->keyBy('id');
     }
+    public function listRule(): array
+    {
+        $list = DB::table($this->model->getTable())
+            ->orderBy('group')
+            ->orderBy('order')
+            ->get()->groupBy('group');
+        $result = [];
+        foreach ($list as $group=>$rules)
+        {
+            $result[]=[
+              'group'=>$group,
+              'group_name'=>$this->group[$group],
+              'list'=>$rules
+            ];
+        }
+        return $result;
+    }
 }

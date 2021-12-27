@@ -27,7 +27,30 @@ class UserRepository extends \App\Repository\BaseRepository implements UserRepos
     }
     public function findByUsername($username)
     {
-        return DB::table($this->model->getTable())->select(['id','status','role','avatar','username'])
-            ->where('username',$username)->first();
+        return DB::table($this->model->getTable())->select(['id','role','avatar','username'])
+            ->where('username',$username)->where('status', 1)->first();
+    }
+    public function getList($keyword = '', $page = 1): array
+    {
+        $query = DB::table($this->model->getTable())->select(['id', 'role','avatar','username'])
+            ->where('status', 1);
+        if ($keyword != '')
+        {
+            $query = $query->where('username', 'LIKE', '%'.$keyword.'%');
+        }
+        if ($page > 1)
+        {
+            $query = $query->where('id','>', $page);
+        }
+        $list = $query->limit(20)->get();
+        $lastId = 0;
+        if ($list->last() && sizeof($list) === 20)
+        {
+            $lastId = $list->last()->id;
+        }
+        return [
+            'list'=>$list,
+            'next_page'=>$lastId
+        ];
     }
 }

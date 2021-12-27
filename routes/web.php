@@ -23,11 +23,21 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['middleware'=>'jwt.auth'], function () use ($router){
         $router->group(['prefix'=>'user'], function () use ($router){
             $router->post('logout', 'Api\Customer\LoginController@logout');
-            $router->post('changePass', 'Api\Customer\UserController@changePass');
+            $router->post('change-password', 'Api\Customer\UserController@changePass');
         });
         $router->group(['prefix'=>'admin', 'middleware'=>'admin'], function () use ($router){
             $router->get('list-package', 'Api\Admin\HomeController@listPackage');
             $router->get('detail-package', 'Api\Admin\HomeController@detailPackage');
+            $router->get('list-benefit', 'Api\Admin\HomeController@listRule');
+            $router->post('create-package', 'Api\Admin\HomeController@createPackage');
+            $router->post('delete-package', 'Api\Admin\HomeController@deletePackage');
+            $router->get('list-contract', 'Api\Admin\HomeController@listContract');
+            $router->post('delete-contract', 'Api\Admin\HomeController@deleteContract');
+            $router->post('update-contract', 'Api\Admin\HomeController@updateContract');
+            $router->post('list-account', 'Api\Admin\HomeController@listAccount');
+            $router->post('create-account', 'Api\Admin\HomeController@createAccount');
+            $router->post('update-account', 'Api\Admin\HomeController@updateAccount');
+            $router->post('delete-account', 'Api\Admin\HomeController@deleteAccount');
         });
     });
 });

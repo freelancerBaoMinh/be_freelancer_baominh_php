@@ -19,7 +19,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'username', 'admin_id', 'status','role','avatar','fcm_token','device'
+        'username', 'admin_id', 'status','role','avatar','fcm_token','device','password'
     ];
     protected $attributes = [
         'status' =>1,
@@ -29,13 +29,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'device'=>0,
         'admin_id'=>0
     ];
+    protected $casts = [
+      'role'=>'integer'
+    ];
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password','created_at','updated_at'
     ];
 
     public function getJWTIdentifier()

@@ -21,14 +21,13 @@ class PackageRepository extends \App\Repository\BaseRepository implements Packag
         $query = DB::table($this->model->getTable())->selectRaw('id as package_id, name');
         if ($page > 1)
         {
-            $query = $query->where('id','<', $page);
+            $query = $query->where('id','>', $page);
         }
-        $list = $query->limit(20)->get();
+        $list = $query->where('status', 1)->limit(20)->get();
         $lastId = 0;
         if ($list->last() && sizeof($list) === 20)
         {
             $lastId = $list->last()->id;
-
         }
         return [
           'list'=>$list,

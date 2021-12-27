@@ -20,7 +20,7 @@ class DetailRepository extends \App\Repository\BaseRepository implements DetailR
     public function getDetail($packageId)
     {
         $detail = DB::table($this->model->getTable())
-            ->where('package_id', $packageId)
+            ->where('package_id', (int)$packageId)
             ->orderBy('rule_id')->get();
         if ($detail)
         {
@@ -28,5 +28,9 @@ class DetailRepository extends \App\Repository\BaseRepository implements DetailR
             return new DetailCollection($detail, $ruleIds);
         }
         return new \stdClass();
+    }
+    public function insert($input)
+    {
+        DB::table($this->model->getTable())->insert($input);
     }
 }

@@ -17,6 +17,7 @@ class CreatePackageUsersTable extends Migration
             $table->id();
             $table->integer('package_id')->index();
             $table->integer('user_id')->index();
+            $table->boolean('status')->default(1)->comment('0: delete, 1: normal');
             $table->timestamps();
         });
     }

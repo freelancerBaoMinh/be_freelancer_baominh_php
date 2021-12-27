@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use Illuminate\Support\Facades\DB;
+
 abstract class BaseRepository
 {
     protected $model;
@@ -32,5 +34,8 @@ abstract class BaseRepository
     public function findById($id)
     {
         return $this->model->find($id);
+    }
+    public function update($condition,$input){
+        DB::table($this->model->getTable())->where($condition)->update($input);
     }
 }

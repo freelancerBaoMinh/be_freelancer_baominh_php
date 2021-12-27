@@ -15,11 +15,11 @@ class ContractResources extends JsonResource
             'code' => $this->resource->code,
             'name' => $this->resource->name,
             'company_name'=>$this->resource->company_name,
-            'birthday'=>date('d/m/Y', strtotime($this->resource->date_of_birth)),
+            'birthday'=>date('d-m-Y', strtotime($this->resource->date_of_birth)),
             'cmnd'=>$this->resource->cmnd,
             'gender'=>($this->resource->gender === 0)?'Nữ':'Nam',
-            'effective_date'=>date('d/m/Y', strtotime($this->resource->effective_date)),
-            'end_date'=>date('d/m/Y', strtotime($this->resource->end_date)),
+            'effective_date'=>date('d-m-Y', strtotime($this->resource->effective_date)),
+            'end_date'=>date('d-m-Y', strtotime($this->resource->end_date)),
             'email'=>$this->resource->email
         ];
     }
