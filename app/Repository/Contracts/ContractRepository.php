@@ -21,7 +21,7 @@ class ContractRepository extends \App\Repository\BaseRepository implements Contr
     {
         $select = ['name', 'email', 'contract_number', 'code', 'company_name',
             'date_of_birth', 'cmnd', 'gender', 'effective_date', 'end_date', 'agency_ids',
-            'gender', 'package_code', 'relationship'];
+            'gender', 'package_code', 'relationship','id'];
         $contract = DB::table($this->model->getTable())->select($select)
             ->where('user_id', $userId)
             ->where('status', 1)
