@@ -26,7 +26,7 @@ class CreateContractsTable extends Migration
             $table->timestamp('effective_date')->nullable();
             $table->timestamp('end_date')->nullable();
             $table->integer('package_code')->comment('package code id')->index();
-            $table->string('email')->index();
+            $table->string('email', 50)->index();
             $table->integer('user_id')->default(0);
             $table->string('relationship');
             $table->boolean('status')->default(1)->comment('0: delete, 1: normal');
