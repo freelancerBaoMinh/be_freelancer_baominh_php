@@ -25,6 +25,7 @@ class ContractRepository extends \App\Repository\BaseRepository implements Contr
         $contract = DB::table($this->model->getTable())->select($select)
             ->where('user_id', $userId)
             ->where('status', 1)
+            ->where('relationship', 0)
             ->first();
         if ($contract)
         {
@@ -34,22 +35,9 @@ class ContractRepository extends \App\Repository\BaseRepository implements Contr
     }
     public function getList($page = 1): array
     {
-        $query = DB::table($this->model->getTable())->selectRaw("id,name, email, contract_number, code, company_name,
-            date_of_birth, cmnd, gender, effective_date, end_date,
-            gender, package_code, relationship")->where('status', 1);
-        if ($page > 1)
-        {
-            $query = $query->where('id','>', $page);
-        }
-        $list = $query->limit(20)->get();
-        $lastId = 0;
-        if ($list->last() && sizeof($list) === 20)
-        {
-            $lastId = $list->last()->id;
-        }
-        return [
-            'list'=>ContractResources::collection($list),
-            'next_page'=>$lastId
-        ];
+        $resp = $this->paginateSortDesc(['status'=>1], ['id','name','email','contract_number','code','company_name',
+            'date_of_birth','cmnd','gender','effective_date','end_date','package_code','relationship'], $page);
+        $resp['list'] = ContractResources::collection($resp['list']);
+        return $resp;
     }
 }

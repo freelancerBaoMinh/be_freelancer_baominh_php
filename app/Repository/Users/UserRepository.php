@@ -53,4 +53,10 @@ class UserRepository extends \App\Repository\BaseRepository implements UserRepos
             'next_page'=>$lastId
         ];
     }
+    public function getListById($ids)
+    {
+        return DB::table($this->model->getTable())->select(['username','id','avatar'])
+            ->whereIn('id', $ids)
+            ->get()->keyBy('id');
+    }
 }

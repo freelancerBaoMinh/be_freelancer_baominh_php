@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Repository\Compensation\CompensationRepository;
+use App\Repository\Compensation\CompensationRepositoryInterface;
 use App\Repository\Contracts\ContractRepository;
 use App\Repository\Contracts\ContractRepositoryInterface;
 use App\Repository\Details\DetailRepository;
 use App\Repository\Details\DetailRepositoryInterface;
+use App\Repository\History\HistoryRepository;
+use App\Repository\History\HistoryRepositoryInterface;
 use App\Repository\Packages\PackageRepository;
 use App\Repository\Packages\PackageRepositoryInterface;
 use App\Repository\Packages\PackageUserRepository;
@@ -34,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(DetailRepositoryInterface::class, DetailRepository::class);
         $this->app->bind(RuleRepositoryInterface::class, RuleRepository::class);
         $this->app->bind(PackageUserRepositoryInterface::class, PackageUserRepository::class);
+        $this->app->bind(CompensationRepositoryInterface::class, CompensationRepository::class);
+        $this->app->bind(HistoryRepositoryInterface::class, HistoryRepository::class);
     }
     public function boot()
     {

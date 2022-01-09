@@ -15,7 +15,7 @@ class Contract extends \Illuminate\Database\Eloquent\Model
         'company_name' => '',
         'agency_ids' => '[]',
         'gender' => 0,
-        'relationship' => '',
+        'relationship' => 0,
         'status'=>1
     ];
 }

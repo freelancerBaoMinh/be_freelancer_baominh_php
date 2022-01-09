@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Repository\Compensation\CompensationRepositoryInterface;
 use App\Repository\Contracts\ContractRepositoryInterface;
 use App\Repository\Details\DetailRepositoryInterface;
+use App\Repository\History\HistoryRepositoryInterface;
 use App\Repository\Packages\PackageRepositoryInterface;
 use App\Repository\Packages\PackageUserRepositoryInterface;
 use App\Repository\Rules\RuleRepositoryInterface;
@@ -40,13 +42,23 @@ class HomeController extends \App\Http\Controllers\Controller
      * @var UserRepositoryInterface
      */
     private $userRepository;
+    /**
+     * @var CompensationRepositoryInterface
+     */
+    private $compensationRepository;
+    /**
+     * @var HistoryRepositoryInterface
+     */
+    private $historyRepository;
 
-    public function __construct(PackageRepositoryInterface     $packageRepository,
-                                DetailRepositoryInterface      $detailRepository,
-                                RuleRepositoryInterface        $ruleRepository,
-                                PackageUserRepositoryInterface $packageUserRepository,
-                                ContractRepositoryInterface    $contractRepository,
-                                UserRepositoryInterface $userRepository
+    public function __construct(PackageRepositoryInterface      $packageRepository,
+                                DetailRepositoryInterface       $detailRepository,
+                                RuleRepositoryInterface         $ruleRepository,
+                                PackageUserRepositoryInterface  $packageUserRepository,
+                                ContractRepositoryInterface     $contractRepository,
+                                UserRepositoryInterface         $userRepository,
+                                CompensationRepositoryInterface $compensationRepository,
+                                HistoryRepositoryInterface      $historyRepository
     )
     {
         $this->packageRepository = $packageRepository;
@@ -55,6 +67,8 @@ class HomeController extends \App\Http\Controllers\Controller
         $this->packageUserRepository = $packageUserRepository;
         $this->contractRepository = $contractRepository;
         $this->userRepository = $userRepository;
+        $this->compensationRepository = $compensationRepository;
+        $this->historyRepository = $historyRepository;
     }
 
     public function listPackage(Request $request): \Illuminate\Http\JsonResponse
@@ -168,22 +182,22 @@ class HomeController extends \App\Http\Controllers\Controller
         $this->contractRepository->update(['id' => $contractId], $input);
         return $this->successResponseMessage(new \stdClass(), 200, 'success');
     }
+
     public function createAccount(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'username'=>'required|string|min:6',
-            'password'=>'required|string|min:6',
-            'role'=>'numeric|min:0|max:2'
+            'username' => 'required|string|min:6',
+            'password' => 'required|string|min:6',
+            'role' => 'numeric|min:0|max:2'
         ]);
         $username = $request->get('username');
         $userLogin = $request->get('user');
         $user = $this->userRepository->findByUsername($username);
-        if ($user)
-        {
+        if ($user) {
             return $this->successResponseMessage(new \stdClass(), 4004, 'Username đã tồn tại');
         }
-        $input = $request->only(['username','password','role']);
-        $input['admin_id']= $userLogin->id;
+        $input = $request->only(['username', 'password', 'role']);
+        $input['admin_id'] = $userLogin->id;
         $user = $this->userRepository->create($input);
         unset($user->admin_id);
         unset($user->fcm_token);
@@ -191,28 +205,95 @@ class HomeController extends \App\Http\Controllers\Controller
         unset($user->device);
         return $this->successResponseMessage($user, 200, 'success');
     }
+
     public function listAccount(Request $request): \Illuminate\Http\JsonResponse
     {
         $page = (int)$request->get('page', 1);
-        $keyword = $request->get('keyword','');
+        $keyword = $request->get('keyword', '');
         $list = $this->userRepository->getList($keyword, $page);
         return $this->successResponseMessage($list, 200, 'success');
     }
+
     public function updateAccount(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'user_id'=>'required|numeric',
-            'role'=>'numeric|min:0|max:2'
+            'user_id' => 'required|numeric',
+            'role' => 'numeric|min:0|max:2'
         ]);
         $this->userRepository->update(['id' => (int)$request->get('user_id')], ['role' => $request->get('role')]);
         return $this->successResponseMessage(new \stdClass(), 200, 'success');
     }
+
     public function deleteAccount(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-           'user_id'=>'required|numeric'
+            'user_id' => 'required|numeric'
         ]);
         $this->userRepository->update(['id' => (int)$request->get('user_id')], ['status' => 0]);
         return $this->successResponseMessage(new \stdClass(), 200, 'success');
+    }
+
+    public function accept(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'compensation_id' => 'required|numeric',
+            'pay_total' => 'required|numeric',
+            'pay_content' => 'required|string'
+        ]);
+        $user = $request->get('user');
+        $compensationId = (int)$request->get('compensation_id');
+        $compensation = $this->compensationRepository->findById($compensationId);
+        if ($compensation) {
+            if ($compensation->status === 1) {
+                return $this->errorResponse('Compensation has been processed', 444);
+            }
+            $compensation->update([
+                'status' => 1
+            ]);
+            $input = $request->only(['compensation_id', 'pay_total', 'pay_content']);
+            $input['admin_id'] = $user->id;
+            $input['reason'] = $compensation->diagnose;
+            $input['user_id'] = $compensation->user_id;
+            $input['date_request'] = strtotime($compensation->created_at);
+            $input['pay_date'] = strtotime(Carbon::now());
+            $input['status'] = 1;
+            $this->historyRepository->create($input);
+            return $this->successResponseMessage(new \stdClass(), 200, 'success');
+        }
+        return $this->errorResponse('Compensation not found', 404);
+    }
+    public function cancel(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'compensation_id' => 'required|numeric',
+            'reason' => 'required|string'
+        ]);
+        $user = $request->get('user');
+        $compensationId = (int)$request->get('compensation_id');
+        $compensation = $this->compensationRepository->findById($compensationId);
+        if ($compensation) {
+            if ($compensation->status === 1) {
+                return $this->errorResponse('Compensation has been processed', 444);
+            }
+            $compensation->update([
+                'status' => 1
+            ]);
+            $input = $request->only(['compensation_id', 'pay_total', 'pay_content']);
+            $input['admin_id'] = $user->id;
+            $input['reason'] = $request->get('reason');
+            $input['user_id'] = $compensation->user_id;
+            $input['date_request'] = strtotime($compensation->created_at);
+            $input['pay_date'] = strtotime(Carbon::now());
+            $input['status'] = 0;
+            $this->historyRepository->create($input);
+            return $this->successResponseMessage(new \stdClass(), 200, 'success');
+        }
+        return $this->errorResponse('Compensation not found', 404);
+    }
+    public function listCompensation(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $page = (int)$request->get('page', 1);
+        $list = $this->compensationRepository->list(0, $page);
+        return $this->successResponseMessage($list, 200, 'success');
     }
 }

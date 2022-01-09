@@ -25,6 +25,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('logout', 'Api\Customer\LoginController@logout');
             $router->post('change-password', 'Api\Customer\UserController@changePass');
         });
+        $router->group(['prefix'=>'compensation'], function () use ($router){
+            $router->post('request', 'Api\Customer\CompensationController@store');
+            $router->get('history', 'Api\Customer\CompensationController@list');
+        });
         $router->group(['prefix'=>'admin', 'middleware'=>'admin'], function () use ($router){
             $router->get('list-package', 'Api\Admin\HomeController@listPackage');
             $router->get('detail-package', 'Api\Admin\HomeController@detailPackage');
@@ -38,6 +42,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('create-account', 'Api\Admin\HomeController@createAccount');
             $router->post('update-account', 'Api\Admin\HomeController@updateAccount');
             $router->post('delete-account', 'Api\Admin\HomeController@deleteAccount');
+            $router->post('accept-compensation', 'Api\Admin\HomeController@accept');
+            $router->post('cancel-compensation', 'Api\Admin\HomeController@cancel');
+            $router->get('list-compensation', 'Api\Admin\HomeController@listCompensation');
         });
     });
 });
