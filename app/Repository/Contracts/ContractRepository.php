@@ -3,7 +3,9 @@
 namespace App\Repository\Contracts;
 
 use App\Http\Resources\ContractResources;
+use App\Http\Resources\Contracts\ContractCollection;
 use App\Models\Contract;
+use App\Repository\Packages\PackageRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class ContractRepository extends \App\Repository\BaseRepository implements ContractRepositoryInterface
@@ -29,7 +31,8 @@ class ContractRepository extends \App\Repository\BaseRepository implements Contr
             ->first();
         if ($contract)
         {
-            return new ContractResources($contract);
+            $package = app()->make(PackageRepositoryInterface::class)->findById($contract->package_code);
+            return new ContractResources($contract, $package);
         }
         return new \stdClass();
     }
@@ -37,7 +40,8 @@ class ContractRepository extends \App\Repository\BaseRepository implements Contr
     {
         $resp = $this->paginateSortDesc(['status'=>1], ['id','name','email','contract_number','code','company_name',
             'date_of_birth','cmnd','gender','effective_date','end_date','package_code','relationship'], $page);
-        $resp['list'] = ContractResources::collection($resp['list']);
+        $packageIds = $resp['list']->pluck('package_code')->toArray();
+        $resp['list'] = new ContractCollection($resp['list'], $packageIds);
         return $resp;
     }
 }

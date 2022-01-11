@@ -34,4 +34,14 @@ class PackageRepository extends \App\Repository\BaseRepository implements Packag
           'next_page'=>$lastId
         ];
     }
+    public function getListIds($ids): \Illuminate\Support\Collection
+    {
+        return DB::table($this->model->getTable())->selectRaw('id as package_id, name, code')->whereIn('id', $ids)
+            ->where('status', 1)->get()->keyBy('package_id');
+    }
+    public function findById($id)
+    {
+        return DB::table($this->model->getTable())->selectRaw('id as package_id, name, code')->where('id', $id)
+            ->where('status', 1)->first();
+    }
 }
