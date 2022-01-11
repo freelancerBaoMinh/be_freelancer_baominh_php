@@ -18,7 +18,7 @@ class PackageRepository extends \App\Repository\BaseRepository implements Packag
     }
     public function getList($page = 1)
     {
-        $query = DB::table($this->model->getTable())->selectRaw('id as package_id, name');
+        $query = DB::table($this->model->getTable())->selectRaw('id as package_id, name, code');
         if ($page > 1)
         {
             $query = $query->where('id','>', $page);
