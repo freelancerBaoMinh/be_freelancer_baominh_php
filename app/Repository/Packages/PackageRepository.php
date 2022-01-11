@@ -27,7 +27,7 @@ class PackageRepository extends \App\Repository\BaseRepository implements Packag
         $lastId = 0;
         if ($list->last() && sizeof($list) === 20)
         {
-            $lastId = $list->last()->id;
+            $lastId = isset($list->last()->id)?$list->last()->id:0;
         }
         return [
           'list'=>$list,

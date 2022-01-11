@@ -78,14 +78,6 @@ class HomeController extends \App\Http\Controllers\Controller
         return $this->successResponseMessage($list, 200, 'success');
     }
 
-    public function detailPackage(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $this->validate($request, [
-            'package_id' => 'numeric|required'
-        ]);
-        return $this->successResponseMessage($this->detailRepository->getDetail($request->get('package_id')), 200, 'success');
-    }
-
     public function listRule(): \Illuminate\Http\JsonResponse
     {
         $list = $this->ruleRepository->listRule();

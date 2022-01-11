@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Customer;
 
 use App\Repository\Compensation\CompensationRepositoryInterface;
+use App\Repository\Details\DetailRepositoryInterface;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -23,12 +24,17 @@ class CompensationController extends \App\Http\Controllers\Controller
      * @var int|mixed
      */
     private $userId;
+    /**
+     * @var DetailRepositoryInterface
+     */
+    private $detailRepository;
 
-    public function __construct(JWTAuth $jwt, CompensationRepositoryInterface $compensationRepository)
+    public function __construct(JWTAuth $jwt, CompensationRepositoryInterface $compensationRepository, DetailRepositoryInterface $detailRepository)
     {
         $this->compensationRepository = $compensationRepository;
         $this->userLogin = $jwt->user();
         $this->userId = ($this->userLogin)?$this->userLogin->id:0;
+        $this->detailRepository = $detailRepository;
     }
     public function store(Request $request)
     {
@@ -92,5 +98,12 @@ class CompensationController extends \App\Http\Controllers\Controller
         $page = (int)$request->get('page', 1);
         $list = $this->compensationRepository->listByUser($this->userId, $page);
         return $this->successResponseMessage($list, 200, 'success');
+    }
+    public function detailPackage(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'package_id' => 'numeric|required'
+        ]);
+        return $this->successResponseMessage($this->detailRepository->getDetail($request->get('package_id')), 200, 'success');
     }
 }

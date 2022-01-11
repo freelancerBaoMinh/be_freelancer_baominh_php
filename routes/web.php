@@ -31,7 +31,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         });
         $router->group(['prefix'=>'admin', 'middleware'=>'admin'], function () use ($router){
             $router->get('list-package', 'Api\Admin\HomeController@listPackage');
-            $router->get('detail-package', 'Api\Admin\HomeController@detailPackage');
             $router->get('list-benefit', 'Api\Admin\HomeController@listRule');
             $router->post('create-package', 'Api\Admin\HomeController@createPackage');
             $router->post('delete-package', 'Api\Admin\HomeController@deletePackage');
@@ -46,5 +45,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('cancel-compensation', 'Api\Admin\HomeController@cancel');
             $router->get('list-compensation', 'Api\Admin\HomeController@listCompensation');
         });
+        $router->get('admin/detail-package', 'Api\Customer\CompensationController@detailPackage');
     });
 });
