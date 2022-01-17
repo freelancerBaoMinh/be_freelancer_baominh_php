@@ -32,7 +32,8 @@ class ContractResources extends JsonResource
             'effective_date'=>date('d-m-Y', strtotime($this->resource->effective_date)),
             'end_date'=>date('d-m-Y', strtotime($this->resource->end_date)),
             'email'=>$this->resource->email,
-            'package'=>$this->package??new \stdClass()
+            'package'=>$this->package??new \stdClass(),
+            'relation_name'=>$this->resource->relationship_name??''
         ];
     }
 }

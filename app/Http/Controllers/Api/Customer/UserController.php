@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Customer;
 
+use App\Repository\Contracts\ContractRepositoryInterface;
 use App\Repository\Users\UserRepositoryInterface;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -27,13 +28,18 @@ class UserController extends \App\Http\Controllers\Controller
      * @var \Tymon\JWTAuth\Contracts\JWTSubject
      */
     private $userLogin;
+    /**
+     * @var ContractRepositoryInterface
+     */
+    private $contractRepository;
 
-    public function __construct(JWTAuth $jwt, UserRepositoryInterface $userRepository)
+    public function __construct(JWTAuth $jwt, UserRepositoryInterface $userRepository, ContractRepositoryInterface $contractRepository)
     {
         $this->jwt = $jwt;
         $this->userRepository = $userRepository;
         $this->userLogin = $jwt->user();
         $this->userId = ($this->userLogin)?$this->userLogin->id:0;
+        $this->contractRepository = $contractRepository;
     }
     public function changePass(Request $request)
     {
@@ -58,8 +64,9 @@ class UserController extends \App\Http\Controllers\Controller
         }
         return $this->successResponseMessage(new \stdClass(), $status, $message);
     }
-    public function getBenefit()
+    public function getRelationShip(): \Illuminate\Http\JsonResponse
     {
-
+        $list = $this->contractRepository->getRelationship($this->userId);
+        return $this->successResponseMessage(['list'=>$list], 200, 'success');
     }
 }

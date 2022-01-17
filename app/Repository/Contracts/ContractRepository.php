@@ -23,7 +23,7 @@ class ContractRepository extends \App\Repository\BaseRepository implements Contr
     {
         $select = ['name', 'email', 'contract_number', 'code', 'company_name',
             'date_of_birth', 'cmnd', 'gender', 'effective_date', 'end_date', 'agency_ids',
-            'gender', 'package_code', 'relationship','id'];
+            'gender', 'package_code', 'relationship_name','id'];
         $contract = DB::table($this->model->getTable())->select($select)
             ->where('user_id', $userId)
             ->where('status', 1)
@@ -38,10 +38,23 @@ class ContractRepository extends \App\Repository\BaseRepository implements Contr
     }
     public function getList($page = 1): array
     {
-        $resp = $this->paginateSortDesc(['status'=>1], ['id','name','email','contract_number','code','company_name',
-            'date_of_birth','cmnd','gender','effective_date','end_date','package_code','relationship'], $page);
+        $resp = $this->paginateSortDesc(['status'=>1, 'relationship'=>0], ['id','name','email','contract_number','code','company_name',
+            'date_of_birth','cmnd','gender','effective_date','end_date','package_code','relationship_name'], $page);
         $packageIds = $resp['list']->pluck('package_code')->toArray();
         $resp['list'] = new ContractCollection($resp['list'], $packageIds);
         return $resp;
+    }
+    public function getRelationship($userId): ContractCollection
+    {
+        $list = DB::table($this->model->getTable())
+            ->select(['id','name','email','contract_number','code','company_name',
+                'date_of_birth','cmnd','gender','effective_date','end_date','package_code','relationship_name'])
+            ->where('status', 1)
+            ->where('user_id', $userId)
+            ->where('relationship','>', 0)
+            ->orderBy('id', 'DESC')
+            ->get();
+        $packageIds = $list->pluck('package_code')->toArray();
+        return new ContractCollection($list, $packageIds);
     }
 }

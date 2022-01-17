@@ -24,6 +24,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->group(['prefix'=>'user'], function () use ($router){
             $router->post('logout', 'Api\Customer\LoginController@logout');
             $router->post('change-password', 'Api\Customer\UserController@changePass');
+            $router->get('relation', 'Api\Customer\UserController@getRelationShip');
         });
         $router->group(['prefix'=>'compensation'], function () use ($router){
             $router->post('request', 'Api\Customer\CompensationController@store');
