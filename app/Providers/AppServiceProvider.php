@@ -6,6 +6,8 @@ use App\Repository\Compensation\CompensationRepository;
 use App\Repository\Compensation\CompensationRepositoryInterface;
 use App\Repository\Contracts\ContractRepository;
 use App\Repository\Contracts\ContractRepositoryInterface;
+use App\Repository\Costs\CostRepository;
+use App\Repository\Costs\CostRepositoryInterface;
 use App\Repository\Details\DetailRepository;
 use App\Repository\Details\DetailRepositoryInterface;
 use App\Repository\History\HistoryRepository;
@@ -40,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PackageUserRepositoryInterface::class, PackageUserRepository::class);
         $this->app->bind(CompensationRepositoryInterface::class, CompensationRepository::class);
         $this->app->bind(HistoryRepositoryInterface::class, HistoryRepository::class);
+        $this->app->bind(CostRepositoryInterface::class, CostRepository::class);
     }
     public function boot()
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Customer;
 
 use App\Repository\Compensation\CompensationRepositoryInterface;
+use App\Repository\Costs\CostRepositoryInterface;
 use App\Repository\Details\DetailRepositoryInterface;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -28,13 +29,21 @@ class CompensationController extends \App\Http\Controllers\Controller
      * @var DetailRepositoryInterface
      */
     private $detailRepository;
+    /**
+     * @var CostRepositoryInterface
+     */
+    private $costRepository;
 
-    public function __construct(JWTAuth $jwt, CompensationRepositoryInterface $compensationRepository, DetailRepositoryInterface $detailRepository)
+    public function __construct(JWTAuth $jwt, CompensationRepositoryInterface $compensationRepository,
+                                DetailRepositoryInterface $detailRepository,
+                                CostRepositoryInterface $costRepository
+    )
     {
         $this->compensationRepository = $compensationRepository;
         $this->userLogin = $jwt->user();
         $this->userId = ($this->userLogin)?$this->userLogin->id:0;
         $this->detailRepository = $detailRepository;
+        $this->costRepository = $costRepository;
     }
     public function store(Request $request)
     {
@@ -58,7 +67,8 @@ class CompensationController extends \App\Http\Controllers\Controller
             'date_of_admission'=>'required|numeric',
             'date_of_discharge'=>'required|numeric',
             'media' => 'array|max:5',
-            'media.*' => 'image|mimes:jpg,jpeg,png|max:5120'
+            'media.*' => 'image|mimes:jpg,jpeg,png|max:5120',
+            'cost'=>'string'
         ]);
         $input = $request->only([
             'insurance_name','email','phone','cmnd','level','pay_request','day_off','is_cash','birthday','bank_number',
@@ -70,7 +80,13 @@ class CompensationController extends \App\Http\Controllers\Controller
             $input['media'] = json_encode($media);
         }
         $input['user_id'] = $this->userId;
-        $this->compensationRepository->create($input);
+        $compensation = $this->compensationRepository->create($input);
+        $costs = $request->get('cost', '[]');
+        $costs = json_decode($costs, true);
+        if (is_array($costs) && sizeof($costs) > 0)
+        {
+            $this->costRepository->insertCost($costs, $compensation->id);
+        }
         return $this->successResponseMessage(new \stdClass(), 200, 'success');
     }
 
