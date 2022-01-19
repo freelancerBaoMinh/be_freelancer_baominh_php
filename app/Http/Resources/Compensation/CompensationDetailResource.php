@@ -8,10 +8,16 @@ class CompensationDetailResource extends \Illuminate\Http\Resources\Json\JsonRes
      * @var mixed
      */
     private $user;
-    public function __construct($resource, $user = null)
+    /**
+     * @var array|mixed
+     */
+    private $costs;
+
+    public function __construct($resource, $user = null, $costs = [])
     {
         parent::__construct($resource);
         $this->user = $user;
+        $this->costs = $costs;
     }
 
     public function toArray($request)
@@ -33,7 +39,8 @@ class CompensationDetailResource extends \Illuminate\Http\Resources\Json\JsonRes
             'hospital_name'=>$this->resource->hospital_name,
             'date_of_admission'=>$this->resource->date_of_admission,
             'date_of_discharge'=>$this->resource->date_of_discharge,
-            'employee_request'=>$this->user??new \stdClass()
+            'employee_request'=>$this->user??new \stdClass(),
+            'costs'=>$this->costs
         ];
     }
 }

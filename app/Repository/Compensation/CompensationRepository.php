@@ -45,7 +45,8 @@ class CompensationRepository extends \App\Repository\BaseRepository implements C
     {
         $resp = $this->paginateSortDesc(['status'=>$status], ['*'], $page);
         $userIds = $resp['list']->pluck('user_id')->toArray();
-        $resp['list'] = new CompensationDetailCollection($resp['list'], $userIds);
+        $ids = $resp['list']->pluck('id')->toArray();
+        $resp['list'] = new CompensationDetailCollection($resp['list'], $userIds, $ids);
         return $resp;
     }
 }

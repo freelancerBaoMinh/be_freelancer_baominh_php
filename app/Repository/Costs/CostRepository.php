@@ -30,4 +30,11 @@ class CostRepository extends \App\Repository\BaseRepository implements CostRepos
         }
         DB::table($this->model->getTable())->insert($data);
     }
+    public function getCostByRequest($requestIds): \Illuminate\Support\Collection
+    {
+        return DB::table($this->model->getTable())
+            ->whereIn('request_id', $requestIds)
+            ->get()
+            ->groupBy('request_id');
+    }
 }
